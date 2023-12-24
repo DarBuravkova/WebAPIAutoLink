@@ -38,12 +38,12 @@ namespace WebAPIAutoLink.Repository
 
         public ICollection<Order> GetOrders()
         {
-            throw new NotImplementedException();
+            return _context.Orders.ToList();
         }
 
         public ICollection<Order> GetUserOrders(int id)
         {
-            return _context.Orders.ToList();
+            return _context.Orders.Where(c => c.User.Id == id).ToList();
         }
 
         public bool OrderExists(int id)

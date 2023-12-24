@@ -28,91 +28,90 @@ namespace WebAPIAutoLink.Controllers
             _mapper = mapper;
         }
 
-        //[HttpGet]
-        //[ProducesResponseType(200, Type = typeof(IEnumerable<Order>))]
-        //public IActionResult GetOrders()
-        //{
-        //    var Orders = _mapper.Map<List<OrderDto>>(_orderRepository.GetOrders());
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Order>))]
+        public IActionResult GetOrders()
+        {
+            var Orders = _mapper.Map<List<OrderDto>>(_orderRepository.GetOrders());
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return Ok(Orders);
-        //}
+            return Ok(Orders);
+        }
 
-        //[HttpGet("{Id}")]
-        //[ProducesResponseType(200, Type = typeof(Order))]
-        //[ProducesResponseType(400)]
-        //public IActionResult GetOrder(int id)
-        //{
-        //    if (!_orderRepository.OrderExists(id))
-        //        return NotFound();
+        [HttpGet("{Id}")]
+        [ProducesResponseType(200, Type = typeof(Order))]
+        [ProducesResponseType(400)]
+        public IActionResult GetOrder(int id)
+        {
+            if (!_orderRepository.OrderExists(id))
+                return NotFound();
 
-        //    var Order = _mapper.Map<OrderDto>(_orderRepository.GetOrder(id));
+            var Order = _mapper.Map<OrderDto>(_orderRepository.GetOrder(id));
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return Ok(Order);
-        //}
+            return Ok(Order);
+        }
 
-        //[HttpGet("/isConfirmed")]
-        //[ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        //public IActionResult GetNotConfirmedOrder()
-        //{
-        //    var reviews = _mapper.Map<List<OrderDto>>(_orderRepository.GetNotConfirmedOrder());
+        [HttpGet("/isConfirmed")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        public IActionResult GetNotConfirmedOrder()
+        {
+            var reviews = _mapper.Map<List<OrderDto>>(_orderRepository.GetNotConfirmedOrder());
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return Ok(reviews);
-        //}
+            return Ok(reviews);
+        }
 
-        //[HttpGet("user/{id}")]
-        //[ProducesResponseType(200, Type = typeof(Order))]
-        //[ProducesResponseType(400)]
-        //public IActionResult GetReviewsForAPokemon(int pokeId)
-        //{
-        //    var reviews = _mapper.Map<List<OrderDto>>(_orderRepository.GetUserOrders(pokeId));
+        [HttpGet("user/{id}")]
+        [ProducesResponseType(200, Type = typeof(Order))]
+        [ProducesResponseType(400)]
+        public IActionResult GetReviewsForAPokemon(int pokeId)
+        {
+            var reviews = _mapper.Map<List<OrderDto>>(_orderRepository.GetUserOrders(pokeId));
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest();
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-        //    return Ok(reviews);
-        //}
+            return Ok(reviews);
+        }
 
-        //[HttpPost]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(400)]
-        //public IActionResult CreateReview([FromQuery] int userId, [FromQuery] int carId, 
-        //    [FromQuery] int startLocationId, [FromQuery] int endLocationId, 
-        //    [FromBody] OrderDto orderCreate)
-        //{
-        //    if (orderCreate == null)
-        //        return BadRequest(ModelState);
+        [HttpPost]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreateOrder([FromQuery] int userId, [FromQuery] int carId,
+            [FromQuery] int startLocationId, [FromQuery] int endLocationId,
+            [FromBody] OrderDto orderCreate)
+        {
+            if (orderCreate == null)
+                return BadRequest(ModelState);
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    var orderMap = _mapper.Map<Order>(orderCreate);
+            var orderMap = _mapper.Map<Order>(orderCreate);
 
-        //    orderMap.User = _userRepository.GetUser(userId);
-        //    orderMap.Car = _carRepository.GetCar(carId);
-        //    orderMap.StartLocationId = _locationRepository.GetLocation(startLocationId);
-        //    orderMap.EndLocationId = _locationRepository.GetLocation(endLocationId);
+            orderMap.User = _userRepository.GetUser(userId);
+            orderMap.Car = _carRepository.GetCar(carId);
+            orderMap.StartLocationId = startLocationId;
+            orderMap.EndLocationId = endLocationId;
+
+            if (!_orderRepository.CreateOrder(orderMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while savin");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Successfully created");
+        }
 
 
-        //    if (!_orderRepository.CreateOrder(orderMap))
-        //    {
-        //        ModelState.AddModelError("", "Something went wrong while savin");
-        //        return StatusCode(500, ModelState);
-        //    }
 
-        //    return Ok("Successfully created");
-        //}
 
-        
-
-        
     }
 }
