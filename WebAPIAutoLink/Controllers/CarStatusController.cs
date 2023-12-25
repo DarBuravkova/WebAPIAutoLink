@@ -35,28 +35,6 @@ namespace WebAPIAutoLink.Controllers
             return Ok(status);
         }
 
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateCarStatus([FromBody] CarStatusDto statusCreate)
-        {
-            if (statusCreate == null)
-                return BadRequest(ModelState);
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var statusMap = _mapper.Map<CarStatus>(statusCreate);
-
-            if (!_carStatusRepository.CreateCarStatus(statusMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while savin");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully created");
-        }
-
         [HttpPut("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]

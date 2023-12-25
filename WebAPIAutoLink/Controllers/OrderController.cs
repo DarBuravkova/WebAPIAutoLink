@@ -40,7 +40,7 @@ namespace WebAPIAutoLink.Controllers
             return Ok(Orders);
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Order))]
         [ProducesResponseType(400)]
         public IActionResult GetOrder(int id)
@@ -95,10 +95,28 @@ namespace WebAPIAutoLink.Controllers
 
             var orderMap = _mapper.Map<Order>(orderCreate);
 
+            var car = _carRepository.GetCar(carId);
+            if (car == null)
+            {
+                ModelState.AddModelError("", "Car not found");
+                return BadRequest(ModelState);
+            }
+
+            if (car.IsRented)
+            {
+                ModelState.AddModelError("", "Car is already rented");
+                return BadRequest(ModelState);
+            }
+
+            decimal price = orderCreate.UsageTime * car.Price;
+            orderMap.Price = price;
+
             orderMap.User = _userRepository.GetUser(userId);
             orderMap.Car = _carRepository.GetCar(carId);
             orderMap.StartLocationId = startLocationId;
             orderMap.EndLocationId = endLocationId;
+
+            car.IsRented = true;
 
             if (!_orderRepository.CreateOrder(orderMap))
             {

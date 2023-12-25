@@ -73,8 +73,6 @@ namespace WebAPIAutoLink.Controllers
             existingUser.Patronymic = updatedUser.Patronymic ?? existingUser.Patronymic;
             existingUser.BirthDate = updatedUser.BirthDate != default ? updatedUser.BirthDate : existingUser.BirthDate;
             existingUser.Phone = updatedUser.Phone ?? existingUser.Phone;
-            existingUser.Photo = updatedUser.Photo != 0 ? updatedUser.Photo : existingUser.Photo;
-            existingUser.Role = updatedUser.Role ?? existingUser.Role;
 
             if (!_userRepository.UpdateUser(existingUser))
             {

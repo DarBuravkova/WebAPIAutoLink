@@ -49,39 +49,6 @@ namespace WebAPIAutoLink.Controllers
             return Ok(fleetOwner);
         }
 
-        [HttpPost]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        public IActionResult CreateFleetOwner([FromQuery] int Id, [FromBody] FleetOwnerDto fleetOwnerCreate)
-        {
-            if (fleetOwnerCreate == null)
-                return BadRequest(ModelState);
-
-            var owners = _fleetOwnerRepository.GetFleetOwners()
-                .Where(c => c.CompanyName.Trim().ToUpper() == fleetOwnerCreate.CompanyName.TrimEnd().ToUpper())
-                .FirstOrDefault();
-
-            if (owners != null)
-            {
-                ModelState.AddModelError("", "Fleet Owner already exists");
-                return StatusCode(422, ModelState);
-            }
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var fleetOwnerMap = _mapper.Map<FleetOwner>(fleetOwnerCreate);
-
-
-            if (!_fleetOwnerRepository.CreateFleetOwner(fleetOwnerMap))
-            {
-                ModelState.AddModelError("", "Something went wrong while savin");
-                return StatusCode(500, ModelState);
-            }
-
-            return Ok("Successfully created");
-        }
-
         [HttpPut("{Id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]

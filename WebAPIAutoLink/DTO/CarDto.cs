@@ -7,7 +7,6 @@
         public string Model { get; set; } = string.Empty;
         public int Year { get; set; }
         public decimal Price { get; set; }
-        public byte Photo { get; set; }
-        public bool IsRented { get; set; }
+        public bool IsRented { get; set; } = false;
     }
 }

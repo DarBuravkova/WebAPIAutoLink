@@ -19,7 +19,8 @@ namespace WebAPIAutoLink.Migrations
                     ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,7 +55,7 @@ namespace WebAPIAutoLink.Migrations
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Photo = table.Column<byte>(type: "tinyint", nullable: false),
+                    Photo = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
@@ -74,7 +75,7 @@ namespace WebAPIAutoLink.Migrations
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
-                    Photo = table.Column<byte>(type: "tinyint", nullable: false),
+                    Photo = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     IsRented = table.Column<bool>(type: "bit", nullable: false),
                     FleetOwnersId = table.Column<int>(type: "int", nullable: false),
                     LocationsId = table.Column<int>(type: "int", nullable: false),

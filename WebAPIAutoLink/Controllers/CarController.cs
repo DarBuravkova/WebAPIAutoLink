@@ -137,6 +137,40 @@ namespace WebAPIAutoLink.Controllers
             return Ok("Successfully created");
         }
 
+        [HttpPost]
+        [Route("AddPhoto")]
+        public IActionResult AddPhoto(int carId)
+        {
+            // Check if the request contains multipart/form-data.
+            if (!HttpContext.Request.HasFormContentType)
+            {
+                return BadRequest("Unsupported media type");
+            }
+
+            var file = HttpContext.Request.Form.Files[0].OpenReadStream();
+            byte[] carPhoto;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                file.CopyTo(memoryStream);
+                carPhoto = memoryStream.ToArray();
+            }
+
+            var car = _carRepository.GetCar(carId);
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            // Update the car's photo
+            car.Photo = carPhoto;
+
+            _carRepository.UpdateCar(car);
+
+            return Ok("Car photo added successfully");
+        }
+
         [HttpPut("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]

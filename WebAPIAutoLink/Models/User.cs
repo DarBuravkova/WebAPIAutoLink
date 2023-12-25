@@ -12,7 +12,7 @@ namespace WebAPIAutoLink.Models
         public DateTime BirthDate { get; set; }
         public string Phone { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public byte Photo { get; set; }
+        public byte[] Photo { get; set; } = new byte[0];
         public string Role { get; set; } = string.Empty;
         public byte[] PasswordSalt { get; set; }
         public byte[] PasswordHash { get; set; }
