@@ -45,15 +45,14 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetOrder(int id)
         {
-            if (!_orderRepository.OrderExists(id))
+            var orderEntity = _orderRepository.GetOrder(id);
+
+            if (orderEntity == null)
                 return NotFound();
 
-            var Order = _mapper.Map<OrderDto>(_orderRepository.GetOrder(id));
+            var orderDto = _mapper.Map<OrderDto>(orderEntity);
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return Ok(Order);
+            return Ok(orderDto);
         }
 
         [HttpGet("/isConfirmed")]
@@ -109,9 +108,5 @@ namespace WebAPIAutoLink.Controllers
 
             return Ok("Successfully created");
         }
-
-
-
-
     }
 }

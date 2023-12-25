@@ -14,7 +14,5 @@ namespace WebAPIAutoLink.DTO
         public byte Photo { get; set; }
         public string Role { get; set; } = string.Empty;
 
-        public int AuthId { get; set; }
-        public Authorization Authorizations { get; set; }
     }
 }

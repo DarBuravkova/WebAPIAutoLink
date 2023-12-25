@@ -97,7 +97,7 @@ namespace WebAPIAutoLink.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult CreateCar([FromQuery] int ownerId, [FromQuery] int statusId, [FromQuery] int locationId, [FromBody] CarDto carCreate)
+        public IActionResult CreateCar([FromQuery] int ownerId, [FromQuery] int locationId, [FromBody] CarDto carCreate)
         {
             if (carCreate == null)
                 return BadRequest(ModelState);
@@ -107,13 +107,30 @@ namespace WebAPIAutoLink.Controllers
 
             var carMap = _mapper.Map<Car>(carCreate);
 
+            // Get FleetOwner and Location
             carMap.FleetOwners = _fleetOwnerRepository.GetFleetOwner(ownerId);
             carMap.Locations = _locationRepository.GetLocation(locationId);
-            carMap.CarStatus = _carStatusRepository.GetCarStatus(statusId);
 
-            if (!_carRepository.CreateCar(carMap))
+            // Create a new CarStatus
+            var carStatus = new CarStatus
             {
-                ModelState.AddModelError("", "Something went wrong while savin");
+                Timestamp = DateTime.UtcNow,
+                OdometerReading = 0, // You might want to set a default value
+                FuelLevel = 100,     // You might want to set a default value
+                MaintenanceStatus = "Good", // You might want to set a default value
+            };
+
+
+            // Set CarStatusId to the same value as CarId
+            carStatus.CarId = carMap.Id;
+
+            // Associate CarStatus with the Car
+            carMap.CarStatus = carStatus;
+
+            // Save the Car and its associated CarStatus
+            if (!_carRepository.CreateCar(carMap) || !_carStatusRepository.CreateCarStatus(carStatus))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
                 return StatusCode(500, ModelState);
             }
 

@@ -33,7 +33,7 @@ namespace WebAPIAutoLink.Repository
 
         public Order GetOrder(int id)
         {
-            return _context.Orders.Where(r => r.Id == id).FirstOrDefault();
+            return _context.Orders.FirstOrDefault(r => r.Id == id);
         }
 
         public ICollection<Order> GetOrders()

@@ -1,8 +1,9 @@
-﻿using WebAPIAutoLink.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using WebAPIAutoLink.Models;
 
 namespace WebAPIAutoLink.Models
 {
-    public class User
+    public class User 
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
@@ -13,9 +14,9 @@ namespace WebAPIAutoLink.Models
         public string Email { get; set; } = string.Empty;
         public byte Photo { get; set; }
         public string Role { get; set; } = string.Empty;
-        public ICollection<Order> Orders { get; set; }
+        public byte[] PasswordSalt { get; set; }
+        public byte[] PasswordHash { get; set; }
 
-        public int AuthId { get; set; }
-        public Authorization Authorizations { get; set; }
+        public ICollection<Order> Orders { get; set; }
     }
 }

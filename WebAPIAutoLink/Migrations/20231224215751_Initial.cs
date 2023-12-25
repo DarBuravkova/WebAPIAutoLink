@@ -10,24 +10,6 @@ namespace WebAPIAutoLink.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Authorization",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Login = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TokenCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TokenExpires = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Authorization", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FleetOwners",
                 columns: table => new
                 {
@@ -74,18 +56,12 @@ namespace WebAPIAutoLink.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Photo = table.Column<byte>(type: "tinyint", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AuthId = table.Column<int>(type: "int", nullable: false),
-                    AuthorizationsId = table.Column<int>(type: "int", nullable: false)
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Authorization_AuthorizationsId",
-                        column: x => x.AuthorizationsId,
-                        principalTable: "Authorization",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -212,11 +188,6 @@ namespace WebAPIAutoLink.Migrations
                 name: "IX_Orders_UserId",
                 table: "Orders",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_AuthorizationsId",
-                table: "Users",
-                column: "AuthorizationsId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -238,9 +209,6 @@ namespace WebAPIAutoLink.Migrations
 
             migrationBuilder.DropTable(
                 name: "Locations");
-
-            migrationBuilder.DropTable(
-                name: "Authorization");
         }
     }
 }

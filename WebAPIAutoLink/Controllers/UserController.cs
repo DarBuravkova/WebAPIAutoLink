@@ -11,113 +11,102 @@ namespace WebAPIAutoLink.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        //private readonly IUserRepository _userRepository;
-        //private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        //public UserController(IUserRepository userRepository,
-        //    IMapper mapper)
-        //{
-        //    _userRepository = userRepository;
-        //    _mapper = mapper;
-        //}
+        public UserController(IUserRepository userRepository,
+            IMapper mapper)
+        {
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
 
-        //[HttpGet]
-        //[ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
-        //public IActionResult GetUsers()
-        //{
-        //    var Users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        public IActionResult GetUsers()
+        {
+            var Users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return Ok(Users);
-        //}
+            return Ok(Users);
+        }
 
-        //[HttpGet("{Id}")]
-        //[ProducesResponseType(200, Type = typeof(User))]
-        //[ProducesResponseType(400)]
-        //public IActionResult GetUser(int Id)
-        //{
-        //    if (!_userRepository.UserExists(Id))
-        //        return NotFound();
+        [HttpGet("{Id}")]
+        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
+        public IActionResult GetUser(int Id)
+        {
+            if (!_userRepository.UserExists(Id))
+                return NotFound();
 
-        //    var User = _mapper.Map<UserDto>(_userRepository.GetUser(Id));
+            var User = _mapper.Map<UserDto>(_userRepository.GetUser(Id));
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return Ok(User);
-        //}
+            return Ok(User);
+        }
 
-        //[HttpPost]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(400)]
-        //public IActionResult CreatePokemon([FromQuery] int authId, [FromBody] UserDto userCreate)
-        //{
-        //    if (userCreate == null)
-        //        return BadRequest(ModelState);
+        [HttpPut]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult UpdateUser([FromQuery] int id, [FromBody] UserDto updatedUser)
+        {
+            if (updatedUser == null)
+                return BadRequest(ModelState);
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-        //    var userMap = _mapper.Map<User>(userCreate);
+            var existingUser = _userRepository.GetUser(id);
 
-        //    userMap.Authorizations = _authorizationRepository.GetCarStatus(statusId);
+            if (existingUser == null)
+            {
+                return NotFound(); // User not found
+            }
 
-        //    if (!_carRepository.CreateCar(carMap))
-        //    {
-        //        ModelState.AddModelError("", "Something went wrong while savin");
-        //        return StatusCode(500, ModelState);
-        //    }
+            existingUser.FirstName = updatedUser.FirstName ?? existingUser.FirstName;
+            existingUser.LastName = updatedUser.LastName ?? existingUser.LastName;
+            existingUser.Patronymic = updatedUser.Patronymic ?? existingUser.Patronymic;
+            existingUser.BirthDate = updatedUser.BirthDate != default ? updatedUser.BirthDate : existingUser.BirthDate;
+            existingUser.Phone = updatedUser.Phone ?? existingUser.Phone;
+            existingUser.Photo = updatedUser.Photo != 0 ? updatedUser.Photo : existingUser.Photo;
+            existingUser.Role = updatedUser.Role ?? existingUser.Role;
 
-        //    return Ok("Successfully created");
-        //}
+            if (!_userRepository.UpdateUser(existingUser))
+            {
+                ModelState.AddModelError("", "Something went wrong updating user");
+                return StatusCode(500, ModelState);
+            }
 
-        //[HttpPut("{Id}")]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(404)]
-        //public IActionResult UpdateUser([FromBody] UserDto updatedUser)
-        //{
-        //    if (updatedUser == null)
-        //        return BadRequest(ModelState);
+            return NoContent();
+        }
 
-        //    if (!ModelState.IsValid)
-        //        return BadRequest();
+        [HttpDelete("{Id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteUser(int userId)
+        {
+            if (!_userRepository.UserExists(userId))
+            {
+                return NotFound();
+            }
 
-        //    var UserMap = _mapper.Map<User>(updatedUser);
+            var UserToDelete = _userRepository.GetUser(userId);
 
-        //    if (!_userRepository.UpdateUser(UserMap))
-        //    {
-        //        ModelState.AddModelError("", "Something went wrong updating owner");
-        //        return StatusCode(500, ModelState);
-        //    }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return NoContent();
-        //}
+            if (!_userRepository.DeleteUser(UserToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting owner");
+            }
 
-        //[HttpDelete("{Id}")]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(404)]
-        //public IActionResult DeleteUser(int userId)
-        //{
-        //    if (!_userRepository.UserExists(userId))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var UserToDelete = _userRepository.GetUser(userId);
-
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    if (!_userRepository.DeleteUser(UserToDelete))
-        //    {
-        //        ModelState.AddModelError("", "Something went wrong deleting owner");
-        //    }
-
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
     }
 }

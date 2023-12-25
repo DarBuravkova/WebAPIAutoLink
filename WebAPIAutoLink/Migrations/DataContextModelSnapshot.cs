@@ -22,41 +22,6 @@ namespace WebAPIAutoLink.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("WebAPIAutoLink.Models.Authorization", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("TokenCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("TokenExpires")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Authorization");
-                });
-
             modelBuilder.Entity("WebAPIAutoLink.Models.Car", b =>
                 {
                     b.Property<int>("Id")
@@ -251,12 +216,6 @@ namespace WebAPIAutoLink.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AuthId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AuthorizationsId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
@@ -271,6 +230,14 @@ namespace WebAPIAutoLink.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Patronymic")
                         .IsRequired()
@@ -288,8 +255,6 @@ namespace WebAPIAutoLink.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AuthorizationsId");
 
                     b.ToTable("Users");
                 });
@@ -346,17 +311,6 @@ namespace WebAPIAutoLink.Migrations
                     b.Navigation("Car");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebAPIAutoLink.Models.User", b =>
-                {
-                    b.HasOne("WebAPIAutoLink.Models.Authorization", "Authorizations")
-                        .WithMany()
-                        .HasForeignKey("AuthorizationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Authorizations");
                 });
 
             modelBuilder.Entity("WebAPIAutoLink.Models.Car", b =>
