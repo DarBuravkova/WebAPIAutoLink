@@ -33,15 +33,15 @@ namespace WebAPIAutoLink.Controllers
             return Ok(Locations);
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(Location))]
         [ProducesResponseType(400)]
-        public IActionResult GetLocation(int Id)
+        public IActionResult GetLocation(int id)
         {
-            if (!_locationRepository.LocationExists(Id))
+            if (!_locationRepository.LocationExists(id))
                 return NotFound();
 
-            var location = _mapper.Map<LocationDto>(_locationRepository.GetLocation(Id));
+            var location = _mapper.Map<LocationDto>(_locationRepository.GetLocation(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -57,11 +57,11 @@ namespace WebAPIAutoLink.Controllers
             if (locationCreate == null)
                 return BadRequest(ModelState);
 
-            var address = _locationRepository.GetLocations()
+            var location = _locationRepository.GetLocations()
                 .Where(a => a.Address.Trim().ToUpper() == locationCreate.Address.TrimEnd().ToUpper())
                 .FirstOrDefault();
 
-            if (address != null)
+            if (location != null)
             {
                 ModelState.AddModelError("", "Location already exists");
                 return StatusCode(422, ModelState);
@@ -82,19 +82,19 @@ namespace WebAPIAutoLink.Controllers
             return Ok("Successfully created");
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateLocation(int Id, [FromBody] LocationDto updatedLocation)
+        public IActionResult UpdateLocation(int id, [FromBody] LocationDto updatedLocation)
         {
             if (updatedLocation == null)
                 return BadRequest(ModelState);
 
-            if (Id != updatedLocation.Id)
+            if (id != updatedLocation.Id)
                 return BadRequest(ModelState);
 
-            if (!_locationRepository.LocationExists(Id))
+            if (!_locationRepository.LocationExists(id))
                 return NotFound();
 
             if (!ModelState.IsValid)
@@ -108,21 +108,21 @@ namespace WebAPIAutoLink.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return NoContent();
+            return Ok("Changed");
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteLocation(int Id)
+        public IActionResult DeleteLocation(int id)
         {
-            if (!_locationRepository.LocationExists(Id))
+            if (!_locationRepository.LocationExists(id))
             {
                 return NotFound();
             }
 
-            var locationToDelete = _locationRepository.GetLocation(Id);
+            var locationToDelete = _locationRepository.GetLocation(id);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -132,7 +132,7 @@ namespace WebAPIAutoLink.Controllers
                 ModelState.AddModelError("", "Something went wrong deleting owner");
             }
 
-            return NoContent();
+            return Ok("Deleted");
         }
     }
 }

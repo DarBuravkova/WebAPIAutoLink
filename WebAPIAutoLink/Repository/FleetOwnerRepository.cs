@@ -13,12 +13,6 @@ namespace WebAPIAutoLink.Repository
             _context = context;
         }
 
-        public bool CreateFleetOwner(FleetOwner fleetOwner)
-        {
-            _context.Add(fleetOwner);
-            return Save();
-        }
-
         public bool DeleteFleetOwner(FleetOwner fleetOwner)
         {
             _context.Remove(fleetOwner);
@@ -38,11 +32,6 @@ namespace WebAPIAutoLink.Repository
         public FleetOwner GetFleetOwner(int fleetOwnerId)
         {
             return _context.FleetOwners.Where(o => o.Id == fleetOwnerId).FirstOrDefault();
-        }
-
-        public FleetOwner GetFleetOwnerOfACar(int carId)
-        {
-            return _context.Cars.Where(o => o.Id == carId).Select(c => c.FleetOwners).FirstOrDefault();
         }
 
         public ICollection<FleetOwner> GetFleetOwners()

@@ -32,12 +32,12 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Order>))]
         public IActionResult GetOrders()
         {
-            var Orders = _mapper.Map<List<OrderDto>>(_orderRepository.GetOrders());
+            var orders = _mapper.Map<List<OrderDto>>(_orderRepository.GetOrders());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(Orders);
+            return Ok(orders);
         }
 
         [HttpGet("{id}")]
@@ -45,12 +45,12 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetOrder(int id)
         {
-            var orderEntity = _orderRepository.GetOrder(id);
+            var order = _orderRepository.GetOrder(id);
 
-            if (orderEntity == null)
+            if (order == null)
                 return NotFound();
 
-            var orderDto = _mapper.Map<OrderDto>(orderEntity);
+            var orderDto = _mapper.Map<OrderDto>(order);
 
             return Ok(orderDto);
         }
@@ -59,33 +59,32 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
         public IActionResult GetNotConfirmedOrder()
         {
-            var reviews = _mapper.Map<List<OrderDto>>(_orderRepository.GetNotConfirmedOrder());
+            var orders = _mapper.Map<List<OrderDto>>(_orderRepository.GetNotConfirmedOrder());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(reviews);
+            return Ok(orders);
         }
 
         [HttpGet("user/{id}")]
         [ProducesResponseType(200, Type = typeof(Order))]
         [ProducesResponseType(400)]
-        public IActionResult GetReviewsForAPokemon(int pokeId)
+        public IActionResult GetOrdersForAUser(int id)
         {
-            var reviews = _mapper.Map<List<OrderDto>>(_orderRepository.GetUserOrders(pokeId));
+            var orders = _mapper.Map<List<OrderDto>>(_orderRepository.GetUserOrders(id));
 
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            return Ok(reviews);
+            return Ok(orders);
         }
 
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         public IActionResult CreateOrder([FromQuery] int userId, [FromQuery] int carId,
-            [FromQuery] int startLocationId, [FromQuery] int endLocationId,
-            [FromBody] OrderDto orderCreate)
+            [FromQuery] int endLocationId, [FromBody] OrderDto orderCreate)
         {
             if (orderCreate == null)
                 return BadRequest(ModelState);
@@ -112,8 +111,8 @@ namespace WebAPIAutoLink.Controllers
             orderMap.Price = price;
 
             orderMap.User = _userRepository.GetUser(userId);
-            orderMap.Car = _carRepository.GetCar(carId);
-            orderMap.StartLocationId = startLocationId;
+            orderMap.Car = car; 
+            orderMap.StartLocationId = car.Locations.Id;
             orderMap.EndLocationId = endLocationId;
 
             car.IsRented = true;
@@ -126,5 +125,36 @@ namespace WebAPIAutoLink.Controllers
 
             return Ok("Successfully created");
         }
+
+        [HttpPut("ConfirmOrder/{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult ConfirmOrder(int id)
+        {
+            var order = _orderRepository.GetOrder(id);
+
+            if (order == null)
+            {
+                return NotFound(); 
+            }
+
+            if (order.IsConfirmed)
+            {
+                ModelState.AddModelError("", "Order is already confirmed");
+                return BadRequest(ModelState);
+            }
+
+            order.IsConfirmed = true;
+
+            if (!_orderRepository.UpdateOrder(order))
+            {
+                ModelState.AddModelError("", "Something went wrong while updating the order");
+                return StatusCode(500, ModelState);
+            }
+
+            return Ok("Order confirmed successfully");
+        }
+
     }
 }

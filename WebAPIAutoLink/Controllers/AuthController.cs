@@ -44,6 +44,7 @@ namespace WebAPIAutoLink.Controllers
                 return BadRequest("Invalid email or password");
             }
 
+            // Generate JWT token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescripter = new SecurityTokenDescriptor

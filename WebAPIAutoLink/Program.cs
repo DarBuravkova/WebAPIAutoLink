@@ -12,9 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -33,6 +31,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddCors(options => options.AddPolicy(name: "AutoLinkOrig",
     policy =>
     {
+        // Allow only specific origins, methods, and headers
         policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader();
     }));
 
@@ -41,6 +40,7 @@ builder.Services.Configure<AppSettings>(
 
 builder.Services.AddAuthentication(x =>
 {
+    // Set default authentication and challenge schemes
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(x =>
@@ -49,6 +49,7 @@ builder.Services.AddAuthentication(x =>
     x.SaveToken = true;
     x.TokenValidationParameters = new TokenValidationParameters
     {
+        // Validate issuer signing key, issuer, and audience
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["ApplicationSettings:Secret"])),
         ValidateIssuer = false,
@@ -57,13 +58,14 @@ builder.Services.AddAuthentication(x =>
 });
 
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+// Enable Cross-Origin Resource Sharing (CORS)
 app.UseCors("AutoLinkOrig");
 
 app.UseHttpsRedirection();

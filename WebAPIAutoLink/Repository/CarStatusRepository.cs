@@ -22,12 +22,6 @@ namespace WebAPIAutoLink.Repository
             return Save();
         }
 
-        public bool DeleteCarStatus(CarStatus carStatus)
-        {
-            _context.Remove(carStatus);
-            return Save();
-        }
-
         public CarStatus GetCarStatus(int carId)
         {
             return _context.CarsStatuss.Where(o => o.CarId == carId).FirstOrDefault();

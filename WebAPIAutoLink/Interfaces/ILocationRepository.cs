@@ -6,7 +6,6 @@ namespace WebAPIAutoLink.Interfaces
     {
         ICollection<Location> GetLocations();
         Location GetLocation(int id);
-        ICollection<Car> GetCarsFromALocation(int locationId);
         bool LocationExists(int id);
         bool CreateLocation(Location location);
         bool UpdateLocation(Location location);

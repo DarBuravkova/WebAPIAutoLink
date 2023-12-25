@@ -25,28 +25,28 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUsers()
         {
-            var Users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
+            var users = _mapper.Map<List<UserDto>>(_userRepository.GetUsers());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(Users);
+            return Ok(users);
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
-        public IActionResult GetUser(int Id)
+        public IActionResult GetUser(int id)
         {
-            if (!_userRepository.UserExists(Id))
+            if (!_userRepository.UserExists(id))
                 return NotFound();
 
-            var User = _mapper.Map<UserDto>(_userRepository.GetUser(Id));
+            var user = _mapper.Map<UserDto>(_userRepository.GetUser(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(User);
+            return Ok(user);
         }
 
         [HttpPut]
@@ -65,7 +65,7 @@ namespace WebAPIAutoLink.Controllers
 
             if (existingUser == null)
             {
-                return NotFound(); // User not found
+                return NotFound();
             }
 
             existingUser.FirstName = updatedUser.FirstName ?? existingUser.FirstName;
@@ -80,31 +80,31 @@ namespace WebAPIAutoLink.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return NoContent();
+            return Ok("Changed");
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteUser(int userId)
+        public IActionResult DeleteUser(int id)
         {
-            if (!_userRepository.UserExists(userId))
+            if (!_userRepository.UserExists(id))
             {
                 return NotFound();
             }
 
-            var UserToDelete = _userRepository.GetUser(userId);
+            var userToDelete = _userRepository.GetUser(id);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!_userRepository.DeleteUser(UserToDelete))
+            if (!_userRepository.DeleteUser(userToDelete))
             {
                 ModelState.AddModelError("", "Something went wrong deleting owner");
             }
 
-            return NoContent();
+            return Ok("Deleted");
         }
     }
 }

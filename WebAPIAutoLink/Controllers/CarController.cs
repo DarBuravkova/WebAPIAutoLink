@@ -34,12 +34,12 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
         public IActionResult GetCars()
         {
-            var reviews = _mapper.Map<List<CarDto>>(_carRepository.GetCars());
+            var cars = _mapper.Map<List<CarDto>>(_carRepository.GetCars());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(reviews);
+            return Ok(cars);
         }
 
         [HttpGet("{id}")]
@@ -48,7 +48,10 @@ namespace WebAPIAutoLink.Controllers
         public IActionResult GetCar(int id)
         {
             if (!_carRepository.CarExists(id))
-                return NotFound();
+            {
+                ModelState.AddModelError("", "Car not found");
+                return BadRequest(ModelState);
+            }
 
             var car = _mapper.Map<CarDto>(_carRepository.GetCar(id));
 
@@ -62,24 +65,24 @@ namespace WebAPIAutoLink.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
         public IActionResult GetAvaliableCar()
         {
-            var reviews = _mapper.Map<List<CarDto>>(_carRepository.GetAvailableCars());
+            var cars = _mapper.Map<List<CarDto>>(_carRepository.GetAvailableCars());
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(reviews);
+            return Ok(cars);
         }
 
         [HttpGet("/Location/{id}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
         public IActionResult GetCarsByLocation(int id)
         {
-            var reviews = _mapper.Map<List<CarDto>>(_carRepository.GetCarsByLocation(id));
+            var cars = _mapper.Map<List<CarDto>>(_carRepository.GetCarsByLocation(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(reviews);
+            return Ok(cars);
         }
 
         [HttpGet("/FleetOwner/{id}")]
@@ -107,27 +110,21 @@ namespace WebAPIAutoLink.Controllers
 
             var carMap = _mapper.Map<Car>(carCreate);
 
-            // Get FleetOwner and Location
             carMap.FleetOwners = _fleetOwnerRepository.GetFleetOwner(ownerId);
             carMap.Locations = _locationRepository.GetLocation(locationId);
 
-            // Create a new CarStatus
             var carStatus = new CarStatus
             {
                 Timestamp = DateTime.UtcNow,
-                OdometerReading = 0, // You might want to set a default value
-                FuelLevel = 100,     // You might want to set a default value
-                MaintenanceStatus = "Good", // You might want to set a default value
+                OdometerReading = 0, 
+                FuelLevel = 100,   
+                MaintenanceStatus = "Good", 
             };
 
-
-            // Set CarStatusId to the same value as CarId
             carStatus.CarId = carMap.Id;
 
-            // Associate CarStatus with the Car
             carMap.CarStatus = carStatus;
 
-            // Save the Car and its associated CarStatus
             if (!_carRepository.CreateCar(carMap) || !_carStatusRepository.CreateCarStatus(carStatus))
             {
                 ModelState.AddModelError("", "Something went wrong while saving");
@@ -141,7 +138,6 @@ namespace WebAPIAutoLink.Controllers
         [Route("AddPhoto")]
         public IActionResult AddPhoto(int carId)
         {
-            // Check if the request contains multipart/form-data.
             if (!HttpContext.Request.HasFormContentType)
             {
                 return BadRequest("Unsupported media type");
@@ -163,7 +159,6 @@ namespace WebAPIAutoLink.Controllers
                 return NotFound();
             }
 
-            // Update the car's photo
             car.Photo = carPhoto;
 
             _carRepository.UpdateCar(car);
@@ -197,7 +192,7 @@ namespace WebAPIAutoLink.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return NoContent();
+            return Ok("Changed");
         }
 
         [HttpDelete("{id}")]
@@ -221,15 +216,14 @@ namespace WebAPIAutoLink.Controllers
                 ModelState.AddModelError("", "Something went wrong deleting owner");
             }
 
-            return NoContent();
+            return Ok("Deleted");
         }
 
-        // Added missing delete range of reviews by a reviewer **>CK
         [HttpDelete("/FleetOwner/{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteReviewsByReviewer(int id)
+        public IActionResult DeleteCarsByOwner(int id)
         {
             if (!_fleetOwnerRepository.FleetOwnerExists(id))
                 return NotFound();
@@ -243,7 +237,7 @@ namespace WebAPIAutoLink.Controllers
                 ModelState.AddModelError("", "error deleting reviews");
                 return StatusCode(500, ModelState);
             }
-            return NoContent();
+            return Ok("Deleted");
         }
     }
 }

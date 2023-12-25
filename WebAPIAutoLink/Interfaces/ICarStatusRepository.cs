@@ -8,7 +8,6 @@ namespace WebAPIAutoLink.Interfaces
         bool CarStatusExists(int id);
         bool CreateCarStatus(CarStatus carStatus);
         bool UpdateCarStatus(CarStatus carStatus);
-        bool DeleteCarStatus(CarStatus carStatus);
         bool Save();
     }
 }

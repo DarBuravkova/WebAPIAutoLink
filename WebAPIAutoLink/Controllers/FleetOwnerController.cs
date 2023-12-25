@@ -33,15 +33,15 @@ namespace WebAPIAutoLink.Controllers
             return Ok(fleetOwners);
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(FleetOwner))]
         [ProducesResponseType(400)]
-        public IActionResult GetFleetOwner(int Id)
+        public IActionResult GetFleetOwner(int id)
         {
-            if (!_fleetOwnerRepository.FleetOwnerExists(Id))
+            if (!_fleetOwnerRepository.FleetOwnerExists(id))
                 return NotFound();
 
-            var fleetOwner = _mapper.Map<FleetOwnerDto>(_fleetOwnerRepository.GetFleetOwner(Id));
+            var fleetOwner = _mapper.Map<FleetOwnerDto>(_fleetOwnerRepository.GetFleetOwner(id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -49,47 +49,55 @@ namespace WebAPIAutoLink.Controllers
             return Ok(fleetOwner);
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult UpdateFleetOwner(int Id, [FromBody] FleetOwnerDto updatedFleetOwner)
+        public IActionResult UpdateFleetOwner(int id, [FromBody] FleetOwnerDto updatedFleetOwner)
         {
             if (updatedFleetOwner == null)
                 return BadRequest(ModelState);
 
-            if (Id != updatedFleetOwner.Id)
+            if (id != updatedFleetOwner.Id)
                 return BadRequest(ModelState);
 
-            if (!_fleetOwnerRepository.FleetOwnerExists(Id))
+            if (!_fleetOwnerRepository.FleetOwnerExists(id))
                 return NotFound();
 
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var ownerMap = _mapper.Map<FleetOwner>(updatedFleetOwner);
+            var existingFleetOwner = _fleetOwnerRepository.GetFleetOwner(id);
 
-            if (!_fleetOwnerRepository.UpdateFleetOwner(ownerMap))
+            if (existingFleetOwner == null)
+                return NotFound();
+
+            // Update only specific properties
+            existingFleetOwner.CompanyName = updatedFleetOwner.CompanyName ?? existingFleetOwner.CompanyName;
+            existingFleetOwner.ContactPerson = updatedFleetOwner.ContactPerson ?? existingFleetOwner.ContactPerson;
+            existingFleetOwner.Phone = updatedFleetOwner.Phone ?? existingFleetOwner.Phone;
+
+            if (!_fleetOwnerRepository.UpdateFleetOwner(existingFleetOwner))
             {
                 ModelState.AddModelError("", "Something went wrong updating owner");
                 return StatusCode(500, ModelState);
             }
 
-            return NoContent();
+            return Ok("Changed");
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteFleetOwner(int Id)
+        public IActionResult DeleteFleetOwner(int id)
         {
-            if (!_fleetOwnerRepository.FleetOwnerExists(Id))
+            if (!_fleetOwnerRepository.FleetOwnerExists(id))
             {
                 return NotFound();
             }
 
-            var fleetOwnerToDelete = _fleetOwnerRepository.GetFleetOwner(Id);
+            var fleetOwnerToDelete = _fleetOwnerRepository.GetFleetOwner(id);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -99,7 +107,7 @@ namespace WebAPIAutoLink.Controllers
                 ModelState.AddModelError("", "Something went wrong deleting owner");
             }
 
-            return NoContent();
+            return Ok("Deleted");
         }
     }
 }

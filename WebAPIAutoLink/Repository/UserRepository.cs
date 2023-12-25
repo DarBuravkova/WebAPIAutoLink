@@ -14,22 +14,10 @@ namespace WebAPIAutoLink.Repository
             _context = context;
         }
 
-        public bool CreateUser(User user)
-        {
-            _context.Add(user);
-            return Save();
-        }
-
         public bool DeleteUser(User user)
         {
             _context.Remove(user);
             return Save();
-        }
-
-        public User GetUserTrimToUpper(UserDto userCreate)
-        {
-            return GetUsers().Where(c => c.FirstName.Trim().ToUpper() == userCreate.FirstName.TrimEnd().ToUpper())
-                .FirstOrDefault();
         }
 
         public User GetUser(int id)

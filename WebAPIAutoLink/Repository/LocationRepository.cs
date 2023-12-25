@@ -25,11 +25,6 @@ namespace WebAPIAutoLink.Repository
             return Save();
         }
 
-        public ICollection<Car> GetCarsFromALocation(int locationId)
-        {
-            return _context.Cars.Where(c => c.Locations.Id == locationId).ToList();
-        }
-
         public ICollection<Location> GetLocations()
         {
             return _context.Locations.ToList();
